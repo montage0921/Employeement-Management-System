@@ -2,11 +2,12 @@ import { useState } from "react";
 
 import "./App.css";
 import HelloWorld from "./HelloWorld";
+import { ListEmployeeComponent } from "./components/ListEmployeeComponent";
 
 function App() {
   return (
     <>
-      <HelloWorld></HelloWorld>
+      <ListEmployeeComponent></ListEmployeeComponent>
     </>
   );
 }
