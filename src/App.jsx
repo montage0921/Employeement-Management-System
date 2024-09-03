@@ -1,11 +1,12 @@
 import { useState } from "react";
 
 import "./App.css";
+import HelloWorld from "./HelloWorld";
 
 function App() {
   return (
     <>
-      <h1>hello world</h1>
+      <HelloWorld></HelloWorld>
     </>
   );
 }
