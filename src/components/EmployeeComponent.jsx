@@ -1,11 +1,17 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { addEmployee } from "../services/EmployeeService";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  addEmployee,
+  getEmployee,
+  updateEmployee,
+} from "../services/EmployeeService";
 
 export const EmployeeComponent = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+
+  const { id } = useParams();
 
   const [errors, setErrors] = useState({
     firstName: "",
@@ -15,14 +21,44 @@ export const EmployeeComponent = () => {
 
   const navigate = useNavigate();
 
-  function saveEmployee(e) {
+  useEffect(() => {
+    if (id) {
+      getEmployee(id)
+        .then((response) => {
+          setFirstName(response.data.firstName);
+          setLastName(response.data.lastName);
+          setEmail(response.data.email);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [id]);
+
+  function saveOrUpdateEmployee(e) {
     e.preventDefault();
     if (validateForm()) {
+      console.log(id);
       const employee = { firstName, lastName, email };
-      addEmployee(employee).then((response) => {
-        console.log(response.data);
-        navigate("/employees");
-      });
+      if (id) {
+        updateEmployee(id, employee)
+          .then((response) => {
+            console.log(response.data);
+            navigate("/employees");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        addEmployee(employee)
+          .then((response) => {
+            console.log(response.data);
+            navigate("/employees");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     }
   }
 
@@ -57,12 +93,20 @@ export const EmployeeComponent = () => {
     return valid;
   }
 
+  function pageTitle() {
+    if (id) {
+      return <h2 className="text-center mt-3">Update Employee</h2>;
+    } else {
+      return <h2 className="text-center mt-3">Add Employee</h2>;
+    }
+  }
+
   return (
     <>
       <div className="container">
         <br></br>
         <div className="card col-md-6 offset-md-3 offset-md-3">
-          <h2 className="text-center mt-3">Add Employee</h2>
+          {pageTitle()}
           <div className="card-body">
             <form>
               <div className="form-group mb-2">
@@ -113,7 +157,10 @@ export const EmployeeComponent = () => {
                   <div className="invalid-feedback">{errors.email}</div>
                 )}
               </div>
-              <button className="btn btn-success" onClick={saveEmployee}>
+              <button
+                className="btn btn-success"
+                onClick={saveOrUpdateEmployee}
+              >
                 Submit
               </button>
             </form>
